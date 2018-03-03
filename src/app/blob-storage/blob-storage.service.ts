@@ -25,7 +25,7 @@ export class BlobStorageService {
     return progress$.asObservable();
   }
 
-  private uploadFile(accessToken: IBlobAccessToken, file: File, progress$): any {
+  private uploadFile(accessToken: IBlobAccessToken, file: File, progress$: Subject<string>): any {
     const customBlockSize = file.size > 1024 * 1024 * 32 ? 1024 * 1024 * 4 : 1024 * 512;
     const blobUri = accessToken.storageAccount;
     const blobService = AzureStorage.createBlobServiceWithSas(blobUri, accessToken.sas);
@@ -40,7 +40,7 @@ export class BlobStorageService {
     );
   }
 
-  private refreshProgress(speedSummary, progress$): void {
+  private refreshProgress(speedSummary: any, progress$: Subject<string>): void {
     setTimeout(() => {
       if (!this.finishedOrError) {
         const progress = speedSummary.getCompletePercent();
@@ -50,7 +50,7 @@ export class BlobStorageService {
     }, 200);
   }
 
-  private callback(progress$, accessToken): (error, result, response) => void {
+  private callback(progress$: Subject<string>, accessToken: IBlobAccessToken): (error, result, response) => void {
     return (error, result, response) => {
       this.finishedOrError = true;
       if (error) {
