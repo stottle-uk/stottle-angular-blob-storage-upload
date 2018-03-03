@@ -5,8 +5,8 @@ import { Subject } from 'rxjs/Subject';
 declare var AzureStorage: any;
 
 export interface IBlobAccessToken {
-    storageAccount: string;
-    sas: string;
+    blobAccountUrl: string;
+    sasToken: string;
     containerName: string;
 }
 
@@ -15,9 +15,8 @@ export class BlobStorageService {
 
   private finishedOrError = false;
 
-  uploadToBlobStorage(accessToken: IBlobAccessToken, files: FileList): Observable<string> {
-    const progress$ = new Subject<string>();
-    const file = files.item(0);
+  uploadToBlobStorage(accessToken: IBlobAccessToken, file: File): Observable<number> {
+    const progress$ = new Subject<number>();
     const speedSummary = this.uploadFile(accessToken, file, progress$);
 
     this.refreshProgress(speedSummary, progress$);
@@ -25,10 +24,10 @@ export class BlobStorageService {
     return progress$.asObservable();
   }
 
-  private uploadFile(accessToken: IBlobAccessToken, file: File, progress$: Subject<string>): any {
+  private uploadFile(accessToken: IBlobAccessToken, file: File, progress$: Subject<number>): any {
     const customBlockSize = file.size > 1024 * 1024 * 32 ? 1024 * 1024 * 4 : 1024 * 512;
-    const blobUri = accessToken.storageAccount;
-    const blobService = AzureStorage.createBlobServiceWithSas(blobUri, accessToken.sas);
+    const blobUri = accessToken.blobAccountUrl;
+    const blobService = AzureStorage.createBlobServiceWithSas(blobUri, accessToken.sasToken);
     blobService.singleBlobPutThresholdInBytes = customBlockSize;
 
     return blobService.createBlockBlobFromBrowserFile(
@@ -40,7 +39,7 @@ export class BlobStorageService {
     );
   }
 
-  private refreshProgress(speedSummary: any, progress$: Subject<string>): void {
+  private refreshProgress(speedSummary: any, progress$: Subject<number>): void {
     setTimeout(() => {
       if (!this.finishedOrError) {
         const progress = speedSummary.getCompletePercent();
@@ -50,13 +49,13 @@ export class BlobStorageService {
     }, 200);
   }
 
-  private callback(progress$: Subject<string>, accessToken: IBlobAccessToken): (error, result, response) => void {
+  private callback(progress$: Subject<number>, accessToken: IBlobAccessToken): (error, result, response) => void {
     return (error, result, response) => {
       this.finishedOrError = true;
       if (error) {
         progress$.error('Error uploading to blob storage: ' + JSON.stringify(accessToken));
       } else {
-        progress$.next('100');
+        progress$.next(100);
         progress$.complete();
       }
     };
