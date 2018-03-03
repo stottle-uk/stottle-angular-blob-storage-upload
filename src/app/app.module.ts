@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 
 
 import { AppComponent } from './app.component';
+import { BlobStorageService } from './blob-storage/blob-storage.service';
 
 
 @NgModule({
@@ -12,7 +13,7 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule
   ],
-  providers: [],
+  providers: [BlobStorageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
