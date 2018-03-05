@@ -5,9 +5,9 @@ import { Subject } from 'rxjs/Subject';
 declare var AzureStorage: any;
 
 export interface IBlobAccessToken {
-    blobAccountUrl: string;
-    sasToken: string;
-    containerName: string;
+  blobAccountUrl: string;
+  sasToken: string;
+  containerName: string;
 }
 
 @Injectable()
@@ -27,7 +27,10 @@ export class BlobStorageService {
   private uploadFile(accessToken: IBlobAccessToken, file: File, progress$: Subject<number>): any {
     const customBlockSize = file.size > 1024 * 1024 * 32 ? 1024 * 1024 * 4 : 1024 * 512;
     const blobUri = accessToken.blobAccountUrl;
-    const blobService = AzureStorage.createBlobServiceWithSas(blobUri, accessToken.sasToken);
+    const blobService = AzureStorage
+      .createBlobServiceWithSas(blobUri, accessToken.sasToken)
+      .withFilter(new AzureStorage.ExponentialRetryPolicyFilter());
+
     blobService.singleBlobPutThresholdInBytes = customBlockSize;
 
     return blobService.createBlockBlobFromBrowserFile(
@@ -43,7 +46,7 @@ export class BlobStorageService {
     setTimeout(() => {
       if (!this.finishedOrError) {
         const progress = speedSummary.getCompletePercent();
-        progress$.next(progress.toString());
+        progress$.next(progress);
         this.refreshProgress(speedSummary, progress$);
       }
     }, 200);
