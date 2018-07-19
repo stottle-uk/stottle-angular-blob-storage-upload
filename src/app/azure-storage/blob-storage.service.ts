@@ -1,10 +1,18 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
-import { AzureStorage, IBlobService, ISasToken, ISpeedSummary } from './azureStorage';
+import {
+  BLOB_STORAGE_TOKEN,
+  IBlobService,
+  IBlobStorage,
+  ISasToken,
+  ISpeedSummary
+} from './azureStorage';
 
 @Injectable()
 export class BlobStorageService {
+  constructor(@Inject(BLOB_STORAGE_TOKEN) private blobStorage: IBlobStorage) {}
+
   uploadToBlobStorage(sasToken: ISasToken, file: File): Observable<number> {
     const customBlockSize = this.getBlockSize(file);
     const options = { blockSize: customBlockSize };
@@ -16,9 +24,9 @@ export class BlobStorageService {
   }
 
   private createBlobService(accessToken: string, blobUri: string): IBlobService {
-    return AzureStorage.Blob.createBlobServiceWithSas(blobUri, accessToken).withFilter(
-      new AzureStorage.Blob.ExponentialRetryPolicyFilter()
-    );
+    return this.blobStorage
+      .createBlobServiceWithSas(blobUri, accessToken)
+      .withFilter(new this.blobStorage.ExponentialRetryPolicyFilter());
   }
 
   private uploadFile(
@@ -41,12 +49,12 @@ export class BlobStorageService {
 
   private getProgress(speedSummary: ISpeedSummary, observer: Subscriber<number>): void {
     const progress = parseInt(speedSummary.getCompletePercent(2), 10);
-    observer.next(progress === 100 ? 99.99 : progress);
+    observer.next(progress === 100 ? 99 : progress);
   }
 
   private callback(error: any, observer: Subscriber<number>): void {
     if (error) {
-      observer.error('Error uploading to blob storage: ' + JSON.stringify(error));
+      observer.error(error);
     } else {
       observer.next(100);
       observer.complete();

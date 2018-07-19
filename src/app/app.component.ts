@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BlobStorageService } from './azure-storage/azure-storage.service';
 import { ISasToken } from './azure-storage/azureStorage';
+import { BlobStorageService } from './azure-storage/blob-storage.service';
 
 @Component({
   selector: 'app-root',

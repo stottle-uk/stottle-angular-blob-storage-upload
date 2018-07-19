@@ -1,10 +1,12 @@
+import { InjectionToken } from '@angular/core';
+
 export interface IAzureStorage {
   Blob: IBlobStorage;
 }
 
 export interface IBlobStorage {
   ExponentialRetryPolicyFilter: any;
-  createBlobServiceWithSas: (a: string, b: string) => IBlobService;
+  createBlobServiceWithSas: (uri: string, sharedAccessToken: string) => IBlobService;
 }
 
 export interface ISpeedSummary {
@@ -13,6 +15,7 @@ export interface ISpeedSummary {
   getAverageSpeed: () => string;
   getSpeed: () => string;
 }
+
 export interface IBlobService {
   withFilter: (filter: any) => IBlobService;
   createBlockBlobFromBrowserFile: (
@@ -32,4 +35,4 @@ export interface ISasToken {
   filename: string;
 }
 
-export declare var AzureStorage: IAzureStorage;
+export const BLOB_STORAGE_TOKEN = new InjectionToken<IBlobStorage>('BLOB_STORAGE_TOKEN');
