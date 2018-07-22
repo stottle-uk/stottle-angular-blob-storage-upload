@@ -17,18 +17,24 @@ interface IUploadProgress {
       Welcome to stottle-angular-blob-storage-upload
     </h1>
   </div>
-  <input type="file" multiple="multiple" (change)="onFileChange($event)">   
-  <h2>Upload Progress</h2> 
-  <pre>{{uploadProgress$ | async | json}}</pre>
+  <input type="file" multiple="multiple" (change)="onFileChange($event)">
+
+  <div *ngIf="filesSelected">
+    <h2>Upload Progress</h2> 
+    <pre>{{uploadProgress$ | async | json}}</pre>
+  </div>
   `,
   styles: []
 })
 export class AppComponent {
   uploadProgress$: Observable<IUploadProgress[]>;
+  filesSelected = false;
 
   constructor(private blobStorage: BlobStorageService) {}
 
   onFileChange(event: any): void {
+    this.filesSelected = true;
+
     this.uploadProgress$ = from(event.target.files as FileList).pipe(
       map(file => this.uploadFile(file)),
       combineAll()
@@ -37,11 +43,11 @@ export class AppComponent {
 
   uploadFile(file: File): Observable<IUploadProgress> {
     const accessToken: ISasToken = {
-      container: 'feb886ea-e626-432c-98d8-8c0b764f06be',
+      container: 'containerName',
       filename: file.name,
       storageAccessToken:
-        '?sv=2017-07-29&sr=c&sig=i%2BM8kUK5hzQzSROeE4lb4N3qZ7HK8QaWz3nsV7HsTeo%3D&st=2018-07-22T13%3A36%3A21Z&se=2018-07-22T13%3A51%3A21Z&sp=acw',
-      storageUri: 'https://stu227rpanuap5uvjtfqpvff.blob.core.windows.net/'
+        '?sv=2017-07-29&sr=c&sig=efvM0XPzJHA7gAy6rJHkARImqLDBglt6q7zN2kgrer4%3D&st=2018-07-22T14%3A45%3A18Z&se=2018-07-22T15%3A00%3A18Z&sp=acw',
+      storageUri: 'http://localhost:10000/devstoreaccount1'
     };
 
     return this.blobStorage
