@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { distinctUntilChanged, startWith } from 'rxjs/operators';
 import {
   BLOB_STORAGE_TOKEN,
   IBlobService,
@@ -44,7 +44,10 @@ export class BlobStorageService {
         error => this.callback(error, observer)
       );
       speedSummary.on('progress', () => this.getProgress(speedSummary, observer));
-    }).pipe(distinctUntilChanged());
+    }).pipe(
+      startWith(0),
+      distinctUntilChanged()
+    );
   }
 
   private getProgress(speedSummary: ISpeedSummary, observer: Subscriber<number>): void {
