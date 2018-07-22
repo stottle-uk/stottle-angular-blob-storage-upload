@@ -16,7 +16,7 @@ const speedSummary: ISpeedSummary = {
       .pipe(
         take(4),
         map(intervalCount => 25 * (intervalCount + 1)),
-        tap(intervalCount => (percentComplete = intervalCount)),
+        tap(progress => (percentComplete = progress)),
         tap(
           progress =>
             progress === 100 ? (uploadProgressStub = 99) : (uploadProgressStub = progress)
