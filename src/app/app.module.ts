@@ -1,10 +1,12 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
-import { BLOB_STORAGE_TOKEN, IAzureStorage } from './azure-storage/azureStorage';
+import { BLOB_STORAGE_TOKEN, IBlobStorage } from './azure-storage/azureStorage';
 import { BlobStorageService } from './azure-storage/blob-storage.service';
 
-declare var AzureStorage: IAzureStorage;
+export function azureBlobStorageFactory(): IBlobStorage {
+  return window['AzureStorage'].Blob;
+}
 
 @NgModule({
   declarations: [AppComponent],
@@ -13,7 +15,7 @@ declare var AzureStorage: IAzureStorage;
     BlobStorageService,
     {
       provide: BLOB_STORAGE_TOKEN,
-      useValue: AzureStorage.Blob
+      useFactory: azureBlobStorageFactory
     }
   ],
   bootstrap: [AppComponent]

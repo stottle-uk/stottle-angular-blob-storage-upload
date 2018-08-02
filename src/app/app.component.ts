@@ -43,7 +43,7 @@ export class AppComponent {
 
   uploadFile(file: File): Observable<IUploadProgress> {
     const accessToken: ISasToken = {
-      container: 'containerName',
+      container: 'containername',
       filename: file.name,
       storageAccessToken:
         '?sv=2017-07-29&sr=c&sig=efvM0XPzJHA7gAy6rJHkARImqLDBglt6q7zN2kgrer4%3D&st=2018-07-22T14%3A45%3A18Z&se=2018-07-22T15%3A00%3A18Z&sp=acw',
